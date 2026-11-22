@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1f4e79"/>
+  <circle cx="256" cy="290" r="150" fill="none" stroke="#f6f4ef" stroke-width="24"/>
+  <path d="M256 140c-10-40 10-80 50-90-4 42-24 72-50 90z" fill="#7fcf8c"/>
+  <text x="256" y="340" text-anchor="middle" font-family="Arial, sans-serif" font-size="150" font-weight="700" fill="#f6f4ef">ב</text>
+</svg>

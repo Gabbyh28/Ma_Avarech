@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>מה אברך</title>
+  <meta name="description" content="מה מברכים על מה – ברכה ראשונה ואחרונה לכל מאכל">
+  <meta name="theme-color" content="#1f4e79">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1>מה אברך?</h1>
+    <p class="tagline">ברכה ראשונה ואחרונה לכל מאכל</p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="search" aria-selected="true">חיפוש</button>
+    <button role="tab" data-tab="plate" aria-selected="false">הצלחת שלי <span id="plate-count" class="badge" hidden>0</span></button>
+    <button role="tab" data-tab="info" aria-selected="false">מידע</button>
+  </nav>
+
+  <main>
+    <section id="tab-search" class="panel">
+      <input id="search" type="search" placeholder="חפשו מאכל… (למשל: בננה, עוגה, במבה)" autocomplete="off" aria-label="חיפוש מאכל">
+      <div id="chips" class="chips" role="group" aria-label="סינון לפי קטגוריה"></div>
+      <ul id="results" class="results"></ul>
+      <p id="empty" class="empty" hidden>לא נמצא מאכל. נסו שם אחר.</p>
+    </section>
+
+    <section id="tab-plate" class="panel" hidden>
+      <p class="hint">הוסיפו מאכלים בעזרת כפתור ＋ במסך החיפוש, וקבלו את סדר הברכות והברכה האחרונה המשולבת.</p>
+      <ul id="plate-items" class="plate-items"></ul>
+      <div id="plate-result"></div>
+      <button id="plate-clear" class="secondary" hidden>ניקוי הצלחת</button>
+    </section>
+
+    <section id="tab-info" class="panel info" hidden>
+      <h2>סדר קדימה בברכות</h2>
+      <p>כשיש לפניך כמה מאכלים (בלי לחם), מקדימים לפי הסדר:</p>
+      <ol>
+        <li><b>מזונות</b> – מאפים ותבשילים מחמשת מיני דגן ואורז</li>
+        <li><b>הגפן</b> – יין ומיץ ענבים</li>
+        <li><b>העץ</b> – פירות העץ</li>
+        <li><b>האדמה</b> – ירקות ופירות האדמה</li>
+        <li><b>שהכל</b> – כל השאר</li>
+      </ol>
+      <p>בתוך אותה ברכה, מקדימים פרי משבעת המינים ופרי שלם וחביב.</p>
+
+      <h2>ברכה אחרונה</h2>
+      <ul>
+        <li><b>ברכת המזון</b> – אחרי לחם (כזית בכדי אכילת פרס).</li>
+        <li><b>על המחיה</b> – מזונות מחמשת מיני דגן: חיטה, שעורה, כוסמין, שיבולת שועל ושיפון.</li>
+        <li><b>על הגפן</b> – יין ומיץ ענבים (רביעית).</li>
+        <li><b>על העץ</b> – פירות שנשתבחה בהם ארץ ישראל: ענבים, תאנים, רימונים, זיתים ותמרים. פוטרת גם שאר פירות העץ.</li>
+        <li><b>בורא נפשות</b> – כל השאר.</li>
+      </ul>
+      <p>שיעור לברכה אחרונה: <b>כזית</b> (כ־27 גרם בדרך כלל) תוך כדי אכילת פרס, או <b>רביעית</b> משקה (כ־86 מ״ל) בבת אחת.</p>
+
+      <h2>על פירות ארץ ישראל</h2>
+      <p>על פירות שגדלו בארץ ישראל, חותמים במעין שלוש ״על הארץ ועל פירותיה״ ו״על הארץ ועל פרי גפנה״.</p>
+
+      <p class="disclaimer">המידע כאן הוא כללי ומבוסס על המנהג הרווח. במקרים רבים יש מחלוקות ומנהגים שונים בין עדות – מומלץ לברר עם רב מוסמך.</p>
+    </section>
+  </main>
+
+  <template id="food-template">
+    <li class="food">
+      <div class="food-row">
+        <button class="food-main" aria-expanded="false">
+          <span class="food-name"></span>
+          <span class="tags">
+            <span class="tag rishona"></span>
+            <span class="tag acharona"></span>
+          </span>
+        </button>
+        <button class="add" aria-label="הוספה לצלחת">＋</button>
+      </div>
+      <div class="details" hidden></div>
+    </li>
+  </template>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>

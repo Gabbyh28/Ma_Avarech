@@ -1,0 +1,14 @@
+{
+  "name": "מה אברך",
+  "short_name": "מה אברך",
+  "description": "ברכה ראשונה ואחרונה לכל מאכל",
+  "lang": "he",
+  "dir": "rtl",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#1f4e79",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
