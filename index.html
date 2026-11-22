@@ -30,6 +30,9 @@
 </head>
 <body>
   <header class="appbar">
+    <canvas class="dust" aria-hidden="true"></canvas>
+    <span class="glow glow-start" aria-hidden="true"></span>
+    <span class="glow glow-end" aria-hidden="true"></span>
     <span class="bsd">בס״ד</span>
     <p class="appbar-eyebrow">ברכות הנהנין</p>
     <h1><span class="gold-text">מה אברך?</span></h1>
@@ -175,6 +178,7 @@
   </div>
 
   <div id="reader" class="reader" hidden role="dialog" aria-modal="true" aria-labelledby="reader-title">
+    <span class="corners" aria-hidden="true"><i></i></span>
     <div class="reader-bar">
       <button id="reader-smaller" class="reader-btn" type="button" aria-label="הקטנת הטקסט">א-</button>
       <button id="reader-bigger" class="reader-btn" type="button" aria-label="הגדלת הטקסט">א+</button>

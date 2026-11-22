@@ -106,6 +106,7 @@ function acharonaColor(keyOrName) {
 
 function summary({ title, sub, gold, pill, art, id }) {
   return el('div', { class: 'summary' },
+    el('span', { class: 'corners', 'aria-hidden': 'true' }, el('i')),
     art ? el('span', { class: 'summary-art', html: artSvg(art) }) : null,
     el('div', { class: 'summary-main' },
       el('p', { class: 'summary-title', id: id || '' }, title),
@@ -143,6 +144,95 @@ function toast(text) {
   toastTimer = setTimeout(() => (t.hidden = true), 2600);
 }
 
+// ---------- motion ----------
+const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+function restartAnim(node, cls) {
+  node.classList.remove(cls);
+  void node.offsetWidth;
+  node.classList.add(cls);
+}
+function sparkle(x, y, n = 14) {
+  if (reduceMotion() || !document.body.animate) return;
+  for (let i = 0; i < n; i++) {
+    const s = el('span', { class: 'spark' + (i % 3 === 0 ? ' star' : '') });
+    s.style.left = x + 'px';
+    s.style.top = y + 'px';
+    document.body.append(s);
+    const a = (Math.PI * 2 * i) / n + Math.random() * 0.5;
+    const d = 26 + Math.random() * 34;
+    s.animate(
+      [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(a) * d}px, ${Math.sin(a) * d - 10}px) scale(0)`, opacity: 0 },
+      ],
+      { duration: 550 + Math.random() * 250, easing: 'cubic-bezier(.2,.8,.2,1)' },
+    ).finished.then(() => s.remove(), () => s.remove());
+  }
+}
+function flyToPlate(fromEl, f) {
+  const target = document.querySelector('[data-view=plate] .icon-wrap');
+  if (reduceMotion() || !fromEl || !target || !document.body.animate) return bumpPlate();
+  const r1 = fromEl.getBoundingClientRect();
+  const r2 = target.getBoundingClientRect();
+  const ghost = el('div', { class: 'fly', html: artSvg(f) });
+  Object.assign(ghost.style, { left: r1.left + 'px', top: r1.top + 'px', width: r1.width + 'px', height: r1.height + 'px' });
+  document.body.append(ghost);
+  const dx = r2.left + r2.width / 2 - (r1.left + r1.width / 2);
+  const dy = r2.top + r2.height / 2 - (r1.top + r1.height / 2);
+  ghost.animate(
+    [
+      { transform: 'translate(0,0) scale(1) rotate(0)', opacity: 1 },
+      { transform: `translate(${dx * 0.45}px, ${Math.min(dy * 0.35, 0) - 90}px) scale(.85) rotate(-18deg)`, opacity: 1, offset: 0.45 },
+      { transform: `translate(${dx}px, ${dy}px) scale(.22) rotate(-35deg)`, opacity: 0.4 },
+    ],
+    { duration: 780, easing: 'cubic-bezier(.45,0,.4,1)' },
+  ).finished.then(() => { ghost.remove(); bumpPlate(); }, () => ghost.remove());
+}
+function bumpPlate() {
+  const icon = document.querySelector('[data-view=plate] .icon-wrap');
+  if (icon) restartAnim(icon, 'bump');
+}
+function centerOf(node) {
+  const r = node.getBoundingClientRect();
+  return [r.left + r.width / 2, r.top + r.height / 2];
+}
+
+// gold dust drifting in the header
+function startDust() {
+  const canvas = document.querySelector('.dust');
+  if (!canvas || reduceMotion()) return;
+  const ctx = canvas.getContext('2d');
+  let w = 0, h = 0, visible = true;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const parts = Array.from({ length: 34 }, () => ({ x: Math.random(), y: Math.random(), r: 0.6 + Math.random() * 1.6, vy: 0.00025 + Math.random() * 0.0006, vx: (Math.random() - 0.5) * 0.0003, p: Math.random() * 6.28 }));
+  const resize = () => {
+    const r = canvas.getBoundingClientRect();
+    w = r.width; h = r.height;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  resize();
+  window.addEventListener('resize', resize);
+  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(canvas);
+  const tick = (t) => {
+    if (visible && !document.hidden) {
+      ctx.clearRect(0, 0, w, h);
+      for (const q of parts) {
+        q.y -= q.vy; q.x += q.vx + Math.sin(t / 2000 + q.p) * 0.0002;
+        if (q.y < -0.05) { q.y = 1.05; q.x = Math.random(); }
+        const a = 0.35 + 0.45 * Math.sin(t / 600 + q.p);
+        const g = ctx.createRadialGradient(q.x * w, q.y * h, 0, q.x * w, q.y * h, q.r * 3);
+        g.addColorStop(0, `rgba(255,236,170,${a})`);
+        g.addColorStop(1, 'rgba(212,167,68,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(q.x * w, q.y * h, q.r * 3, 0, 6.283); ctx.fill();
+      }
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 // ---------- navigation ----------
 document.querySelectorAll('.bottom-nav button').forEach((btn) =>
   btn.addEventListener('click', () => showView(btn.dataset.view)),
@@ -153,8 +243,9 @@ function showView(name) {
     else b.removeAttribute('aria-current');
   });
   document.querySelectorAll('.view').forEach((v) => (v.hidden = v.id !== `view-${name}`));
+  restartAnim($(`#view-${name}`), 'view-enter');
   $('#chips').hidden = name !== 'search';
-  if (name === 'plate') renderPlate();
+  if (name === 'plate') { state.plateShown = new Set(); renderPlate(); }
   if (name === 'more') renderMore();
   window.scrollTo({ top: 0 });
 }
@@ -193,7 +284,7 @@ function renderChips() {
         onclick: () => {
           state.category = key;
           renderChips();
-          renderResults();
+          renderResults(true);
         },
       }, text),
     ),
@@ -234,14 +325,27 @@ function foodTile(raw) {
   add.addEventListener('click', () => {
     togglePlate(f.name);
     sync();
+    if (state.plate.includes(f.name)) {
+      sparkle(...centerOf(add));
+      flyToPlate(li.querySelector('.tile-art'), f);
+      restartAnim(li, 'just-added');
+    }
   });
   return li;
 }
 
-function renderResults() {
+function renderResults(animate = false) {
   let list = searchFoods(FOODS, state.query);
   if (state.category) list = list.filter((f) => f.category === state.category);
-  $('#results').replaceChildren(...list.map(foodTile));
+  const tiles = list.map(foodTile);
+  if (animate && !reduceMotion()) {
+    tiles.forEach((t, i) => {
+      t.style.setProperty('--i', String(i));
+      t.classList.add('tile-enter');
+      t.addEventListener('animationend', () => t.classList.remove('tile-enter'), { once: true });
+    });
+  }
+  $('#results').replaceChildren(...tiles);
   $('#empty').hidden = list.length > 0;
   $('#count').hidden = list.length === 0;
   $('#count').textContent = state.query ? `${list.length} תוצאות` : `${list.length} מאכלים`;
@@ -273,6 +377,10 @@ function openSheet(raw) {
     togglePlate(f.name);
     syncBtn();
     renderResults();
+    if (inPlate()) {
+      sparkle(...centerOf(plateBtn), 18);
+      flyToPlate(body.querySelector('.summary-art'), f);
+    }
   });
 
   body.replaceChildren(...[
@@ -374,6 +482,19 @@ function renderPlate() {
     ),
   );
   $('#plate-art').innerHTML = plateSvg(foods);
+  {
+    const shown = state.plateShown || new Set();
+    const svg = $('#plate-art svg');
+    if (shown.size === 0 && svg) svg.classList.add('enter');
+    let i = 0;
+    $('#plate-art').querySelectorAll('[data-name]').forEach((g) => {
+      if (!shown.has(g.dataset.name)) {
+        g.style.setProperty('--i', String(i++));
+        g.classList.add('enter');
+      }
+    });
+    state.plateShown = new Set(foods.map((x) => x.name));
+  }
   $('#plate-clear').hidden = foods.length === 0;
   $('#plate-empty').hidden = foods.length > 0;
   $('#plate-actions').hidden = foods.length === 0;
@@ -507,7 +628,10 @@ function renderCalc() {
   } else if (c.time <= 30) { verdict = 'שתיתם רביעית ברצף – מברכים ברכה אחרונה.'; cls = 'yes'; }
   else { verdict = 'השתייה לא הייתה ברצף (כמו בשתיית משקה חם) – אין ברכה אחרונה.'; cls = 'no'; }
   const r = $('#calc-result');
+  const changed = r.dataset.cls !== cls;
+  r.dataset.cls = cls;
   r.className = `calc-result ${cls}`;
+  if (changed) restartAnim(r, 'pulse');
   r.textContent = verdict;
 }
 $('#calc-amount').addEventListener('input', (e) => { state.calc.amount = Number(e.target.value); renderCalc(); });
@@ -529,7 +653,8 @@ $('#legend').replaceChildren(
 // ---------- init ----------
 renderSettings();
 renderChips();
-renderResults();
+renderResults(true);
+startDust();
 renderCalc();
 updateBadge();
 

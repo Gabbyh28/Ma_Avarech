@@ -486,7 +486,7 @@ export function plateSvg(foods) {
       const rot = ((i * 37) % 30) - 15;
       parts.push(
         `<g transform="translate(${(x - size / 2).toFixed(1)} ${(y - size / 2).toFixed(1)}) rotate(${rot} ${size / 2} ${size / 2})">` +
-        `<svg width="${size}" height="${size}" viewBox="0 0 48 48">${artInner(f)}</svg></g>`,
+        `<g class="pl-food" data-name="${f.name}"><svg width="${size}" height="${size}" viewBox="0 0 48 48">${artInner(f)}</svg></g></g>`,
       );
     });
   }
@@ -499,7 +499,7 @@ export function plateSvg(foods) {
     const top = 150 - ((dn - 1) * step) / 2;
     drinks.forEach((f, i) => {
       parts.push(
-        `<svg x="${325 - dsize / 2}" y="${(top + i * step - dsize / 2).toFixed(1)}" width="${dsize}" height="${dsize}" viewBox="0 0 48 48">${artInner(f)}</svg>`,
+        `<g class="pl-drink" data-name="${f.name}"><svg x="${325 - dsize / 2}" y="${(top + i * step - dsize / 2).toFixed(1)}" width="${dsize}" height="${dsize}" viewBox="0 0 48 48">${artInner(f)}</svg></g>`,
       );
     });
   }
