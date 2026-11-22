@@ -12,7 +12,7 @@ const html = read('index.html');
 const body = html
   .match(/<body>([\s\S]*)<\/body>/)[1]
   .replace(/\s*<script type="module" src="src\/app.js"><\/script>/, '');
-const js = ['src/foods.js', 'src/brachot.js', 'src/app.js'].map((p) => stripModule(read(p))).join('\n');
+const js = ['src/foods.js', 'src/brachot.js', 'src/illustrations.js', 'src/app.js'].map((p) => stripModule(read(p))).join('\n');
 
 const out = `<title>מה אברך</title>
 <meta name="claude:viewport-fit-sides" content="cover">

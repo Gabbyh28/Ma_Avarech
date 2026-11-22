@@ -19,6 +19,11 @@
   --gold-line: #ead9b0;
   --gold-text: #a57c2e;
   --today: #c29a4e;
+  --plate: #ffffff;
+  --plate-rim: #f7f4ee;
+  --plate-line: #e6dfcf;
+  --mat: #e9e1cf;
+  --silver: #b9c0cc;
 
   --b-hamotzi: #8b5320;
   --b-mezonot: #a9790f;
@@ -54,6 +59,11 @@
     --gold-line: #4d4425;
     --gold-text: #e0bc74;
     --today: #b88f45;
+  --plate: #f2f0ea;
+  --plate-rim: #dcd8ce;
+  --plate-line: #c4bfb2;
+  --mat: #1f2a48;
+  --silver: #7f8aa3;
     --b-hamotzi: #e4a76a;
     --b-mezonot: #e8c45e;
     --b-hagafen: #ee8fbd;
@@ -81,6 +91,11 @@
   --gold-line: #4d4425;
   --gold-text: #e0bc74;
   --today: #b88f45;
+  --plate: #f2f0ea;
+  --plate-rim: #dcd8ce;
+  --plate-line: #c4bfb2;
+  --mat: #1f2a48;
+  --silver: #7f8aa3;
   --b-hamotzi: #e4a76a;
   --b-mezonot: #e8c45e;
   --b-hagafen: #ee8fbd;
@@ -113,7 +128,7 @@ body::before {
 
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+:where(.bottom-nav, .search, .sheet-close, .tile-add, .plate-chip button) svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 
 [data-b="hamotzi"] { --c: var(--b-hamotzi); }
 [data-b="mezonot"] { --c: var(--b-mezonot); }
@@ -228,19 +243,20 @@ main {
 .tile-open {
   width: 100%;
   height: 100%;
-  min-height: 104px;
+  min-height: 132px;
   display: grid;
-  grid-template-rows: 14px 1fr auto;
+  grid-template-rows: auto 1fr auto;
   justify-items: center;
   align-items: center;
   gap: 2px;
-  padding: 8px 6px 10px;
+  padding: 12px 6px 10px;
   border: 0;
   background: none;
   text-align: center;
   cursor: pointer;
 }
-.tile-bar { width: 26px; height: 3px; border-radius: 2px; background: var(--c); }
+.tile-art { display: grid; place-items: center; width: 52px; height: 52px; }
+.tile-art svg { width: 100%; height: 100%; }
 .tile-name {
   font-size: 1.02rem;
   font-weight: 700;
@@ -267,7 +283,7 @@ main {
 .tile.added { background: var(--today); }
 .tile.added .tile-name, .tile.added .tile-add { color: var(--gold-ink); }
 .tile.added .tile-bracha { color: var(--gold-ink); opacity: .9; }
-.tile.added .tile-bar { background: var(--gold-ink); }
+.tile.added .tile-art { background: rgb(255 255 255 / .85); border-radius: 50%; }
 .tile.added .tile-note { background: var(--gold-ink); }
 
 .empty { text-align: center; color: var(--muted); padding: 32px 12px; }
@@ -285,7 +301,9 @@ main {
   color: var(--on-navy);
   border-radius: 20px;
 }
-.summary-main { min-width: 0; }
+.summary-main { min-width: 0; flex: 1; }
+.summary-art { flex: none; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: rgb(255 255 255 / .94); }
+.summary-art svg { width: 44px; height: 44px; }
 .summary-title { margin: 0; white-space: nowrap; font-size: 1.6rem; font-weight: 800; line-height: 1.2; }
 .summary-sub { margin: 0; color: var(--on-navy-soft); font-size: .9rem; }
 .summary-side { display: grid; justify-items: end; gap: 6px; min-width: 0; text-align: end; }
@@ -403,10 +421,20 @@ main {
   border-radius: 10px;
   font-weight: 500;
 }
-.plate-chip::before { content: ""; width: 12px; height: 3px; margin-inline-end: 6px; border-radius: 2px; background: var(--c); }
+.plate-chip { border-bottom: 3px solid var(--c); }
+.chip-art { display: grid; width: 24px; height: 24px; margin-inline-end: 4px; }
+.chip-art svg { width: 100%; height: 100%; }
+.plate-stage { margin: 0 -4px 14px; }
+.plate-art { display: block; width: 100%; max-width: 520px; height: auto; margin: 0 auto; }
+.pl-mat { fill: var(--mat); }
+.pl-silver { fill: var(--silver); }
+.pl-shadow { fill: #000; opacity: .08; }
+.pl-rim { fill: var(--plate-rim); }
+.pl-well { fill: var(--plate); }
+.pl-line { fill: none; stroke: var(--plate-line); stroke-width: 1.5; }
 .plate-chip button { display: grid; place-items: center; width: 28px; height: 28px; border: 0; background: none; color: var(--muted); cursor: pointer; }
 .plate-chip button svg { width: 14px; height: 14px; stroke-width: 2.4; }
-.plate-empty { background: var(--gold-soft); border: 1px solid var(--gold-line); border-radius: 18px; color: var(--ink); }
+.plate-empty { padding-top: 18px; background: var(--gold-soft); border: 1px solid var(--gold-line); border-radius: 18px; color: var(--ink); }
 .plate-empty .primary-btn { margin-top: 12px; }
 
 .steps { list-style: none; margin: 0; padding: 0; counter-reset: step; display: grid; gap: 10px; }

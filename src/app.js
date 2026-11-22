@@ -1,5 +1,6 @@
 import { FOODS, CATEGORIES } from './foods.js';
 import { RISHONA, ACHARONA, acharonaText, computePlate, searchFoods } from './brachot.js';
+import { artSvg, plateSvg } from './illustrations.js';
 
 const $ = (sel) => document.querySelector(sel);
 const PLATE_KEY = 'ma-avarech-plate';
@@ -84,8 +85,9 @@ function acharonaColor(keyOrName) {
   return 'shehakol';
 }
 
-function summary({ title, sub, gold, pill }) {
+function summary({ title, sub, gold, pill, art }) {
   return el('div', { class: 'summary' },
+    art ? el('span', { class: 'summary-art', html: artSvg(art) }) : null,
     el('div', { class: 'summary-main' },
       el('p', { class: 'summary-title', id: 'sheet-title' }, title),
       sub ? el('p', { class: 'summary-sub' }, sub) : null,
@@ -147,7 +149,7 @@ function foodTile(food) {
     'li',
     { class: 'tile', 'data-b': food.rishona },
     el('button', { class: 'tile-open', onclick: () => openSheet(food) },
-      el('span', { class: 'tile-bar', 'aria-hidden': 'true' }),
+      el('span', { class: 'tile-art', html: artSvg(food.name) }),
       el('span', { class: 'tile-name' }, food.name),
       el('span', { class: 'tile-bracha' }, RISHONA[food.rishona].name),
     ),
@@ -198,6 +200,7 @@ function openSheet(food) {
   body.replaceChildren(...[
     summary({
       title: food.name,
+      art: food.name,
       sub: CATEGORIES[food.category] + (food.aliases?.length ? ' · גם: ' + food.aliases.slice(0, 3).join(', ') : ''),
       gold: RISHONA[food.rishona].name,
       pill: 'אחרי: ' + ACHARONA[food.acharona].name,
@@ -248,6 +251,7 @@ function renderPlate() {
   $('#plate-items').replaceChildren(
     ...foods.map((food) =>
       el('li', { class: 'plate-chip', 'data-b': food.rishona },
+        el('span', { class: 'chip-art', html: artSvg(food.name) }),
         food.name,
         el('button', {
           html: ICON_X,
@@ -261,6 +265,7 @@ function renderPlate() {
       ),
     ),
   );
+  $('#plate-art').innerHTML = plateSvg(foods);
   $('#plate-clear').hidden = foods.length === 0;
   $('#plate-empty').hidden = foods.length > 0;
 
