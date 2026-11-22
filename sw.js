@@ -1,9 +1,10 @@
 // Service worker: שומר את האפליקציה במטמון כך שתעבוד גם בלי אינטרנט.
-const CACHE = 'ma-avarech-v4';
+const CACHE = 'ma-avarech-v5';
 const ASSETS = [
   './',
   'index.html',
   'styles.css',
+  'fonts/fonts.css',
   'manifest.webmanifest',
   'icons/icon-192.png',
   'icons/apple-touch-icon.png',

@@ -1,0 +1,58 @@
+name: Build Android app
+
+on:
+  push:
+    branches: [main, claude/build-application-0vbptu]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Copy web app into the Android project
+        run: |
+          npm run build:www
+          npx cap sync android
+      - name: Restore upload key
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+      - name: Build APK and App Bundle
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug bundleRelease -PversionCode=${{ github.run_number }}
+      - name: Report signing
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then echo "::notice::App Bundle signed with the upload key"; else echo "::warning::No upload key secret – the App Bundle is unsigned and cannot be uploaded to Google Play yet"; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ma-avarech-apk-for-testing
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ma-avarech-play-bundle
+          path: android/app/build/outputs/bundle/release/app-release.aab

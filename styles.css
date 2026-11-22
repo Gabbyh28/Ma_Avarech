@@ -201,7 +201,7 @@ button { font: inherit; color: inherit; }
 .bsd {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 10px);
-  inset-inline-end: max(14px, env(safe-area-inset-right, 0px));
+  right: max(14px, env(safe-area-inset-right, 0px));
   color: var(--gold-light);
   font-size: .75rem;
   opacity: .85;

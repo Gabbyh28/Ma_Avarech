@@ -1,0 +1,13 @@
+{
+  "appId": "io.github.gabbyh28.maavarech",
+  "appName": "מה אברך",
+  "webDir": "www",
+  "backgroundColor": "#0a1638",
+  "android": {
+    "adjustMarginsForEdgeToEdge": "auto",
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SplashScreen": { "launchShowDuration": 0 }
+  }
+}

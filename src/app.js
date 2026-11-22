@@ -551,6 +551,11 @@ $('#plate-example').addEventListener('click', () => {
 $('#plate-share').addEventListener('click', async () => {
   const text = plateShareText(state.plate.map(byName), state.opts) + `\n\n${SITE_URL}`;
   try {
+    const NativeShare = window.Capacitor?.isNativePlatform?.() && window.Capacitor.Plugins.Share;
+    if (NativeShare) {
+      await NativeShare.share({ title: 'מה אברך?', text, dialogTitle: 'שיתוף סדר הברכות' });
+      return;
+    }
     if (navigator.share) {
       await navigator.share({ title: 'מה אברך?', text });
       return;
@@ -658,6 +663,17 @@ startDust();
 renderCalc();
 updateBadge();
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+// ---------- native app (Android via Capacitor) ----------
+const native = window.Capacitor?.isNativePlatform?.() ? window.Capacitor : null;
+if (native) {
+  document.documentElement.classList.add('native');
+  const { App } = native.Plugins;
+  App?.addListener('backButton', () => {
+    if (!$('#reader').hidden) closeReader();
+    else if (!$('#sheet').hidden) closeSheet();
+    else if ($('#view-search').hidden) showView('search');
+    else App.exitApp();
+  });
+} else if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
