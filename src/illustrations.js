@@ -360,7 +360,19 @@ export function plateSvg(foods) {
   const parts = [];
 
   // placemat + fork
+  parts.push(
+    `<defs>` +
+    `<linearGradient id="goldV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6d0"/><stop offset=".2" stop-color="#f6d77f"/><stop offset=".45" stop-color="#d3a03b"/><stop offset=".6" stop-color="#f9e49d"/><stop offset=".8" stop-color="#b9832a"/><stop offset="1" stop-color="#edc96f"/></linearGradient>` +
+    `<linearGradient id="goldH" x1="0" y1="0" x2="1" y2=".35"><stop offset="0" stop-color="#fff6d0"/><stop offset=".2" stop-color="#f6d77f"/><stop offset=".45" stop-color="#d3a03b"/><stop offset=".6" stop-color="#f9e49d"/><stop offset=".8" stop-color="#b9832a"/><stop offset="1" stop-color="#edc96f"/></linearGradient>` +
+    `<linearGradient id="velvet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b4a9a"/><stop offset=".55" stop-color="#13265c"/><stop offset="1" stop-color="#0a1638"/></linearGradient>` +
+    `<radialGradient id="rim" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4ead6"/><stop offset="1" stop-color="#e2d3b0"/></radialGradient>` +
+    `<pattern id="folds" width="24" height="10" patternUnits="userSpaceOnUse"><rect width="4" height="10" fill="#000" opacity=".18"/><rect x="4" width="6" height="10" fill="#fff" opacity=".045"/></pattern>` +
+    `<radialGradient id="sheen" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>` +
+    `</defs>`,
+  );
   parts.push(`<rect x="8" y="14" width="384" height="272" rx="26" class="pl-mat"/>`);
+  parts.push(`<rect x="8" y="14" width="384" height="272" rx="26" fill="url(#folds)"/>`);
+  parts.push(`<rect x="18" y="24" width="364" height="252" rx="18" fill="none" stroke="url(#goldH)" stroke-width="1" opacity=".55"/>`);
   parts.push(
     `<g class="pl-silver"><rect x="34" y="84" width="7" height="140" rx="3.5"/>` +
     `<path d="M28 52v30a9.5 9.5 0 0 0 19 0V52h-3v26h-2.6V52h-2.8v26h-2.6V52h-2.8v26h-2.6V52z"/></g>`,
@@ -370,6 +382,8 @@ export function plateSvg(foods) {
   parts.push(`<circle cx="${CX}" cy="${CY}" r="122" class="pl-rim"/>`);
   parts.push(`<circle cx="${CX}" cy="${CY}" r="${R_IN}" class="pl-well"/>`);
   parts.push(`<circle cx="${CX}" cy="${CY}" r="110" class="pl-line"/>`);
+  parts.push(`<circle cx="${CX}" cy="${CY}" r="${R_IN + 1}" fill="none" stroke="url(#goldH)" stroke-width="1.2" opacity=".7"/>`);
+  parts.push(`<ellipse cx="${CX - 52}" cy="${CY - 70}" rx="46" ry="16" transform="rotate(-35 ${CX - 52} ${CY - 70})" fill="url(#sheen)"/>`);
 
   // solids
   const n = solids.length;
