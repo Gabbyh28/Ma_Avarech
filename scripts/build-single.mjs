@@ -16,6 +16,9 @@ const js = ['src/foods.js', 'src/brachot.js', 'src/app.js'].map((p) => stripModu
 
 const out = `<title>מה אברך</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap">
 <meta name="description" content="מה מברכים על מה – ברכה ראשונה ואחרונה לכל מאכל">
 <style>
 html { direction: rtl; }
