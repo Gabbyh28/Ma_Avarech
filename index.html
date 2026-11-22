@@ -5,31 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>מה אברך</title>
   <meta name="description" content="מה מברכים על מה – ברכה ראשונה ואחרונה לכל מאכל">
-  <meta name="theme-color" content="#1f4d3a">
+  <meta name="theme-color" content="#1e2a4a">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@500;700&display=swap">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-inner">
-      <p class="eyebrow">ברכות הנהנין</p>
-      <h1>מה אברך?</h1>
-      <p class="lede">חפשו מאכל וקבלו את הברכה שלפניו ושלאחריו</p>
-      <label class="search">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-        <input id="search" type="search" placeholder="בננה, עוגה, במבה…" autocomplete="off" aria-label="חיפוש מאכל">
-      </label>
-    </div>
+  <header class="appbar">
+    <h1>מה אברך?</h1>
+    <p class="appbar-sub">ברכה ראשונה ואחרונה לכל מאכל</p>
   </header>
+  <div class="searchband">
+    <label class="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="search" type="search" placeholder="חפשו מאכל: בננה, עוגה, במבה…" autocomplete="off" aria-label="חיפוש מאכל">
+    </label>
+  </div>
+  <div id="chips" class="catbar" role="group" aria-label="סינון לפי קטגוריה"></div>
 
   <main>
     <section id="view-search" class="view">
-      <div id="chips" class="chips" role="group" aria-label="סינון לפי קטגוריה"></div>
+      <div class="legend" id="legend" aria-label="מקרא צבעים"></div>
       <p id="count" class="count"></p>
       <ul id="results" class="results"></ul>
       <div id="empty" class="empty" hidden>

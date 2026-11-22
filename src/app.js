@@ -84,6 +84,20 @@ function acharonaColor(keyOrName) {
   return 'shehakol';
 }
 
+function summary({ title, sub, gold, pill }) {
+  return el('div', { class: 'summary' },
+    el('div', { class: 'summary-main' },
+      el('p', { class: 'summary-title', id: 'sheet-title' }, title),
+      sub ? el('p', { class: 'summary-sub' }, sub) : null,
+    ),
+    el('div', { class: 'summary-side' },
+      gold ? el('span', { class: 'summary-gold' }, gold) : null,
+      pill ? el('span', { class: 'pill' }, pill) : null,
+    ),
+  );
+}
+const label = (text) => el('p', { class: 'section-label' }, text);
+
 const note = (text) => el('p', { class: 'note' }, el('span', {}, text));
 
 // ---------- navigation ----------
@@ -96,6 +110,7 @@ function showView(name) {
     else b.removeAttribute('aria-current');
   });
   document.querySelectorAll('.view').forEach((v) => (v.hidden = v.id !== `view-${name}`));
+  $('#chips').hidden = name !== 'search';
   if (name === 'plate') renderPlate();
   window.scrollTo({ top: 0 });
 }
@@ -126,45 +141,37 @@ $('#search').addEventListener('focus', () => {
   if ($('#view-search').hidden) showView('search');
 });
 
-function addButton(food) {
-  const btn = el('button', { class: 'add' });
+function foodTile(food) {
+  const add = el('button', { class: 'tile-add' });
+  const li = el(
+    'li',
+    { class: 'tile', 'data-b': food.rishona },
+    el('button', { class: 'tile-open', onclick: () => openSheet(food) },
+      el('span', { class: 'tile-bar', 'aria-hidden': 'true' }),
+      el('span', { class: 'tile-name' }, food.name),
+      el('span', { class: 'tile-bracha' }, RISHONA[food.rishona].name),
+    ),
+    food.note ? el('span', { class: 'tile-note', title: 'יש הערה' }) : null,
+    add,
+  );
   const sync = () => {
     const inPlate = state.plate.includes(food.name);
-    btn.classList.toggle('added', inPlate);
-    btn.innerHTML = inPlate ? ICON_CHECK : ICON_PLUS;
-    btn.setAttribute('aria-label', inPlate ? `הסרת ${food.name} מהצלחת` : `הוספת ${food.name} לצלחת`);
+    li.classList.toggle('added', inPlate);
+    add.innerHTML = inPlate ? ICON_CHECK : ICON_PLUS;
+    add.setAttribute('aria-label', inPlate ? `הסרת ${food.name} מהצלחת` : `הוספת ${food.name} לצלחת`);
   };
   sync();
-  btn.addEventListener('click', () => {
+  add.addEventListener('click', () => {
     togglePlate(food.name);
     sync();
   });
-  return btn;
-}
-
-function foodRow(food) {
-  return el(
-    'li',
-    { class: 'food', 'data-b': food.rishona },
-    el('button', { class: 'food-open', onclick: () => openSheet(food) },
-      el('span', { class: 'mark', 'aria-hidden': 'true' }, food.name[0]),
-      el('span', { class: 'food-text' },
-        el('span', { class: 'food-name' }, food.name),
-        el('span', { class: 'food-sub' },
-          el('b', {}, RISHONA[food.rishona].name),
-          ' · אחרי: ' + ACHARONA[food.acharona].name,
-          food.note ? ' · יש הערה' : '',
-        ),
-      ),
-    ),
-    addButton(food),
-  );
+  return li;
 }
 
 function renderResults() {
   let list = searchFoods(FOODS, state.query);
   if (state.category) list = list.filter((f) => f.category === state.category);
-  $('#results').replaceChildren(...list.map(foodRow));
+  $('#results').replaceChildren(...list.map(foodTile));
   $('#empty').hidden = list.length > 0;
   $('#count').hidden = list.length === 0;
   $('#count').textContent = state.query ? `${list.length} תוצאות` : `${list.length} מאכלים`;
@@ -188,15 +195,20 @@ function openSheet(food) {
     renderResults();
   });
 
-  body.replaceChildren(
-    el('h2', { class: 'sheet-title', id: 'sheet-title' }, food.name),
-    el('p', { class: 'sheet-aliases' },
-      CATEGORIES[food.category] + (food.aliases?.length ? ' · גם: ' + food.aliases.join(', ') : '')),
-    brachaCard({ label: 'לפני', key: food.rishona, name: RISHONA[food.rishona].name, text: RISHONA[food.rishona].text }),
-    brachaCard({ label: 'אחרי', key: acharonaColor(food.acharona), name: ACHARONA[food.acharona].name, text: acharonaText(food.acharona) }),
+  body.replaceChildren(...[
+    summary({
+      title: food.name,
+      sub: CATEGORIES[food.category] + (food.aliases?.length ? ' · גם: ' + food.aliases.slice(0, 3).join(', ') : ''),
+      gold: RISHONA[food.rishona].name,
+      pill: 'אחרי: ' + ACHARONA[food.acharona].name,
+    }),
+    label('ברכה ראשונה'),
+    brachaCard({ key: food.rishona, name: RISHONA[food.rishona].name, text: RISHONA[food.rishona].text }),
+    label('ברכה אחרונה'),
+    brachaCard({ key: acharonaColor(food.acharona), name: ACHARONA[food.acharona].name, text: acharonaText(food.acharona) }),
     food.note ? note(food.note) : null,
     plateBtn,
-  );
+  ].filter(Boolean));
   $('#sheet').hidden = false;
   document.body.style.overflow = 'hidden';
   $('.sheet-close').focus();
@@ -258,23 +270,30 @@ function renderPlate() {
 
   const { hasBread, rishonot, acharonot } = computePlate(foods);
 
-  const before = el('section', { class: 'phase' },
-    el('h3', { class: 'phase-title' }, hasBread ? 'לפני האכילה' : 'לפני האכילה · לפי הסדר'),
+  const head = summary({
+    title: `${foods.length} מאכלים`,
+    sub: hasBread ? 'סעודה עם לחם' : 'לפי סדר הקדימה',
+    gold: `${rishonot.length} לפני · ${acharonot.length} אחרי`,
+    pill: hasBread ? 'ברכת המזון' : acharonot.map((a) => a.name).join(' + '),
+  });
+
+  const before = el('section', {},
+    label(hasBread ? 'לפני האכילה' : 'לפני האכילה, לפי הסדר'),
     el('ol', { class: 'steps' },
       ...rishonot.map((r) => el('li', {}, brachaCard({ key: r.key, name: RISHONA[r.key].name, text: RISHONA[r.key].text, forFoods: r.foods }))),
     ),
     hasBread ? note('ברכת המוציא פוטרת את המאכלים שבתוך הסעודה. על יין, ולדעת רבים גם על פירות לקינוח, מברכים בנפרד.') : null,
   );
 
-  const after = el('section', { class: 'phase' },
-    el('h3', { class: 'phase-title' }, 'אחרי האכילה'),
+  const after = el('section', {},
+    label('אחרי האכילה'),
     el('ol', { class: 'steps' },
       ...acharonot.map((a) => el('li', {}, brachaCard({ key: acharonaColor(a.key === 'meein-shalosh' ? a.name : a.key), name: a.name, text: a.text, forFoods: a.foods }))),
     ),
     acharonot.length > 1 ? note('מברכים קודם את ברכת מעין שלוש, ואחריה בורא נפשות.') : null,
   );
 
-  out.append(before, after);
+  out.append(head, before, after);
 }
 
 $('#plate-clear').addEventListener('click', () => {
@@ -300,6 +319,11 @@ $('#ladder').replaceChildren(
       el('span', { class: 'l-desc' }, desc),
     ),
   ),
+);
+
+// ---------- legend ----------
+$('#legend').replaceChildren(
+  ...Object.entries(RISHONA).map(([key, b]) => el('span', { 'data-b': key }, b.name)),
 );
 
 // ---------- init ----------
