@@ -335,17 +335,92 @@ const ART = {
 
 const FALLBACK = round('#c9cfd8', '#9aa4b2', { leaf: false });
 
+// ---------- parametric art for foods that declare `art: 'kind:#color[:#color2]'` ----------
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const ch = (v) => Math.max(0, Math.min(255, Math.round(v + amt * 255)));
+  const r = ch(n >> 16), g = ch((n >> 8) & 255), b = ch(n & 255);
+  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+}
+const GENERIC = {
+  fruit: (c) => round(c, shade(c, -0.18)),
+  round: (c) => round(c, shade(c, -0.18), { leaf: false }),
+  bowl: (c) => bowlBase(c) + dots([[17, 23.5], [24, 22.6], [30, 24]], shade(c, -0.15), 1.5),
+  mound: (c) => bowlBase(c) + mound(c) + dots([[16, 21], [21, 18], [26, 17], [31, 20], [23, 22], [28, 22]], shade(c, -0.2), 1),
+  long: (c) =>
+    `<rect x="7" y="18" width="34" height="11" rx="5.5" transform="rotate(-30 24 24)" fill="${c}"/>` +
+    `<rect x="11" y="20.5" width="24" height="2.6" rx="1.3" transform="rotate(-30 24 24)" fill="#fff" opacity=".25"/>` +
+    `<path d="M37 11c2-2 4-2 5-1" stroke="#4f7a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>`,
+  berries: (c) =>
+    [[16, 30], [30, 31], [23, 20], [22, 37], [33, 21], [15, 21]].map(([x, y]) =>
+      `<circle cx="${x}" cy="${y}" r="6.5" fill="${c}"/>` + HI(x - 2.6, y - 1.5, 1.1, 1.8)).join(''),
+  balls: (c) =>
+    [[16, 31], [32, 31], [24, 20]].map(([x, y]) =>
+      `<circle cx="${x}" cy="${y}" r="9" fill="${c}"/><path d="M${x - 6} ${y + 5}a9 9 0 0 0 12 0" fill="none" stroke="${shade(c, -0.2)}" stroke-width="2.4" opacity=".6"/>` + HI(x - 3, y - 3, 1.8, 3)).join(''),
+  glass: (c) => glassShape(c, 15),
+  mug: (c) => mug(c),
+  bottle: (c) => bottle(c),
+  jar: (c) => jar(c, '#c8963e'),
+  bag: (c, a) => bag(c, a || '#f6d35a'),
+  can: (c) =>
+    `<rect x="14" y="8" width="20" height="33" rx="4" fill="${c}"/><rect x="14" y="8" width="20" height="4" rx="2" fill="#c9cfd8"/>` +
+    `<rect x="14" y="37" width="20" height="4" rx="2" fill="#c9cfd8"/><path d="M19 18l6 4-4 3 6 5" stroke="#f6d35a" stroke-width="2.4" fill="none"/>` +
+    `<path d="M18 13v22" stroke="#fff" stroke-width="2" opacity=".35" stroke-linecap="round"/>`,
+  flat: (c) =>
+    [36, 31, 26].map((y, i) => `<ellipse cx="24" cy="${y}" rx="${17 - i}" ry="6" fill="${shade(c, -0.12 + i * 0.06)}"/>`).join('') +
+    `<ellipse cx="24" cy="25" rx="15" ry="5" fill="${c}"/>` + HI(19, 24, 3, 1.2, 0),
+  bar: (c) =>
+    `<rect x="7" y="17" width="34" height="15" rx="3" transform="rotate(-14 24 24)" fill="${c}"/>` +
+    `<path d="M12 22l24-6" stroke="#fff" stroke-width="1.6" opacity=".3" transform="rotate(0)"/>` +
+    `<path d="M14 30l3-12M22 28l3-12M30 26l3-12" stroke="${shade(c, -0.18)}" stroke-width="1.2" opacity=".7"/>`,
+  roll: (c) =>
+    `<rect x="6" y="16" width="36" height="16" rx="8" transform="rotate(-18 24 24)" fill="${c}"/>` +
+    `<path d="M14 18c2 4 2 10 0 14M22 16c2 4 2 11 0 15M30 14c2 4 2 11 0 15" stroke="${shade(c, -0.2)}" stroke-width="1.4" fill="none" transform="rotate(-18 24 24)" opacity=".8"/>`,
+  cake: (c) =>
+    `<path d="M8 24h26v14H8z" fill="${c}"/><path d="M34 24l6-8v14l-6 8z" fill="${shade(c, -0.12)}"/>` +
+    `<path d="M8 24h26l6-8H16z" fill="${shade(c, 0.12)}"/>` + HI(14, 30, 4, 1.4, 0),
+  pastry: (c) =>
+    `<path d="M24 10l15 26H9z" fill="${c}" stroke="${shade(c, -0.15)}" stroke-width="2" stroke-linejoin="round"/>` +
+    `<circle cx="24" cy="28" r="5" fill="${shade(c, -0.35)}"/>` + HI(19, 24, 1.5, 4, 30),
+  ring: (c) =>
+    `<circle cx="24" cy="26" r="15" fill="${c}"/><circle cx="24" cy="26" r="5" fill="var(--surface, #fff)"/>` +
+    `<path d="M24 41a15 15 0 0 0 13-8" stroke="${shade(c, -0.2)}" stroke-width="3" fill="none" opacity=".5"/>` +
+    dots([[17, 17], [27, 15], [33, 22], [14, 27], [21, 36]], '#fbf3dc', .9),
+  pretzel: (c) =>
+    `<path d="M24 38c-9-8-15-13-13-20 2-6 9-6 13 0 4-6 11-6 13 0 2 7-4 12-13 20zM17 31l14-11M31 31L17 20" stroke="${c}" stroke-width="4" fill="none" stroke-linecap="round"/>` +
+    dots([[14, 19], [33, 18], [24, 34], [19, 27]], '#fff', .9),
+  muffin: (c) =>
+    `<path d="M13 26h22l-3 14H16z" fill="#e8c27a"/><path d="M16 26l1 14M21 26l.5 14M27 26l-.5 14M32 26l-1 14" stroke="#c99b4e" stroke-width="1"/>` +
+    `<path d="M10 27c0-8 6-13 14-13s14 5 14 13z" fill="${c}"/>` + dots([[18, 20], [26, 18], [30, 23]], shade(c, -0.25), 1.6),
+  krembo: () =>
+    `<ellipse cx="24" cy="38" rx="12" ry="3.5" fill="#d9a24e"/><path d="M12 37c0-14 5-24 12-24s12 10 12 24z" fill="#5b3420"/>` +
+    `<path d="M24 13c-2 2-4 3-7 4" stroke="#c4cad8" stroke-width="5" stroke-linecap="round"/>` + HI(19, 24, 2, 6, 10),
+  shakshuka: () =>
+    `<ellipse cx="24" cy="27" rx="19" ry="12" fill="#2b2b2b"/><ellipse cx="24" cy="26" rx="16" ry="9.5" fill="#c8342a"/>` +
+    `<ellipse cx="18" cy="25" rx="5" ry="3.4" fill="#fff"/><circle cx="18" cy="25" r="2" fill="#f6b51f"/>` +
+    `<ellipse cx="29" cy="28" rx="5" ry="3.4" fill="#fff"/><circle cx="29" cy="28" r="2" fill="#f6b51f"/>` +
+    `<path d="M41 24h6" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>` + dots([[24, 21], [33, 22]], '#3e8a32', 1),
+};
+function generic(spec) {
+  if (!spec) return null;
+  const [kind, c, c2] = spec.split(':');
+  if (kind === 'like') return ART[c] || null;
+  const fn = GENERIC[kind];
+  return fn ? fn(c, c2) : null;
+}
+
 /** Inner SVG markup (viewBox 0 0 48 48) for a food. */
-export function artInner(name) {
-  return ART[name] || FALLBACK;
+export function artInner(food) {
+  const name = typeof food === 'string' ? food : food.name;
+  return ART[name] || (typeof food === 'object' && generic(food.art)) || FALLBACK;
 }
 
 /** Complete inline SVG for a food illustration. */
-export function artSvg(name, cls = 'art') {
-  return `<svg class="${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${artInner(name)}</svg>`;
+export function artSvg(food, cls = 'art') {
+  return `<svg class="${cls}" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${artInner(food)}</svg>`;
 }
 
-export const hasArt = (name) => Boolean(ART[name]);
+export const hasArt = (food) => Boolean(ART[food.name] || generic(food.art));
 
 const isDrink = (food) => food.category === 'drink' || food.rishona === 'hagafen';
 
@@ -411,7 +486,7 @@ export function plateSvg(foods) {
       const rot = ((i * 37) % 30) - 15;
       parts.push(
         `<g transform="translate(${(x - size / 2).toFixed(1)} ${(y - size / 2).toFixed(1)}) rotate(${rot} ${size / 2} ${size / 2})">` +
-        `<svg width="${size}" height="${size}" viewBox="0 0 48 48">${artInner(f.name)}</svg></g>`,
+        `<svg width="${size}" height="${size}" viewBox="0 0 48 48">${artInner(f)}</svg></g>`,
       );
     });
   }
@@ -424,7 +499,7 @@ export function plateSvg(foods) {
     const top = 150 - ((dn - 1) * step) / 2;
     drinks.forEach((f, i) => {
       parts.push(
-        `<svg x="${325 - dsize / 2}" y="${(top + i * step - dsize / 2).toFixed(1)}" width="${dsize}" height="${dsize}" viewBox="0 0 48 48">${artInner(f.name)}</svg>`,
+        `<svg x="${325 - dsize / 2}" y="${(top + i * step - dsize / 2).toFixed(1)}" width="${dsize}" height="${dsize}" viewBox="0 0 48 48">${artInner(f)}</svg>`,
       );
     });
   }

@@ -60,3 +60,40 @@ test('search by alias and ignoring geresh', () => {
   assert.equal(searchFoods(FOODS, 'בננ')[0].name, 'בננה');
   assert.equal(searchFoods(FOODS, '').length, FOODS.length);
 });
+
+import { rishonaText, acharonaText, resolveFood, plateShareText, stripNikud } from '../src/brachot.js';
+
+test('edot hamizrach: nefashot says "שברא" and meein shalosh omits "ונאכל מפריה"', () => {
+  assert.match(acharonaText('nefashot', { nusach: 'edot' }), /על כל מה שברא להחיות/);
+  assert.match(acharonaText('nefashot', { nusach: 'ashkenaz' }), /על כל מה שבראת להחיות/);
+  assert.doesNotMatch(acharonaText('etz', { nusach: 'edot' }), /ונאכל מפריה/);
+  assert.match(acharonaText('etz', { nusach: 'ashkenaz' }), /ונאכל מפריה ונשבע מטובה/);
+});
+
+test('fruits of Eretz Yisrael change the closing', () => {
+  assert.match(acharonaText('etz', { israel: true }), /על הארץ ועל פירותיה\.$/);
+  assert.match(acharonaText('gafen', { israel: true }), /על הארץ ועל פרי גפנה\.$/);
+});
+
+test('nikud on and off', () => {
+  assert.equal(rishonaText('haetz', { nikud: true }), 'בָּרוּךְ אַתָּה ה׳ אֱלֹקֵינוּ מֶלֶךְ הָעוֹלָם, בּוֹרֵא פְּרִי הָעֵץ.');
+  assert.equal(rishonaText('haetz'), 'ברוך אתה ה׳ אלוקינו מלך העולם, בורא פרי העץ.');
+  assert.equal(stripNikud('בִּקְדֻשָּׁה'), 'בקדושה');
+});
+
+test('per-nusach overrides: matza is mezonot for edot hamizrach', () => {
+  const [matza] = get('מצה');
+  assert.equal(resolveFood(matza, { nusach: 'edot' }).rishona, 'mezonot');
+  assert.equal(resolveFood(matza, { nusach: 'ashkenaz' }).rishona, 'hamotzi');
+});
+
+test('gum has no after-blessing and does not appear in acharonot', () => {
+  const r = computePlate(get('מסטיק'));
+  assert.deepEqual(r.rishonot.map((x) => x.key), ['shehakol']);
+  assert.equal(r.acharonot.length, 0);
+});
+
+test('share text lists blessings in order', () => {
+  const t = plateShareText(get('תפוח', 'עוגה'));
+  assert.match(t, /1\. מזונות – על עוגה\n2\. העץ – על תפוח/);
+});

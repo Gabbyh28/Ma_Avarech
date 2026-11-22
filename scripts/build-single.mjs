@@ -12,7 +12,7 @@ const html = read('index.html');
 const body = html
   .match(/<body>([\s\S]*)<\/body>/)[1]
   .replace(/\s*<script type="module" src="src\/app.js"><\/script>/, '');
-const js = ['src/foods.js', 'src/brachot.js', 'src/illustrations.js', 'src/app.js'].map((p) => stripModule(read(p))).join('\n');
+const js = ['src/foods.js', 'src/brachot.js', 'src/illustrations.js', 'src/extras.js', 'src/app.js'].map((p) => stripModule(read(p))).join('\n');
 
 const out = `<title>מה אברך</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -20,6 +20,7 @@ const out = `<title>מה אברך</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap">
 <meta name="description" content="מה מברכים על מה – ברכה ראשונה ואחרונה לכל מאכל">
+<script>document.documentElement.lang = 'he'; document.documentElement.dir = 'rtl';</script>
 <style>
 html { direction: rtl; }
 ${read('styles.css')}

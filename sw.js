@@ -1,15 +1,17 @@
 // Service worker: שומר את האפליקציה במטמון כך שתעבוד גם בלי אינטרנט.
-const CACHE = 'ma-avarech-v2';
+const CACHE = 'ma-avarech-v4';
 const ASSETS = [
   './',
   'index.html',
   'styles.css',
   'manifest.webmanifest',
-  'icon.svg',
+  'icons/icon-192.png',
+  'icons/apple-touch-icon.png',
   'src/app.js',
   'src/brachot.js',
   'src/foods.js',
   'src/illustrations.js',
+  'src/extras.js',
 ];
 
 self.addEventListener('install', (e) => {

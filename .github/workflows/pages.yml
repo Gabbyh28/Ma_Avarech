@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [claude/build-application-0vbptu]
+    branches: [main, claude/build-application-0vbptu]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,7 @@ jobs:
       - name: Collect site files
         run: |
           mkdir _site
-          cp -r index.html styles.css sw.js manifest.webmanifest icon.svg src .nojekyll _site/
+          cp -r index.html styles.css sw.js manifest.webmanifest icon.svg icons og.jpg src .nojekyll _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

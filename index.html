@@ -4,11 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>מה אברך</title>
-  <meta name="description" content="מה מברכים על מה – ברכה ראשונה ואחרונה לכל מאכל">
+  <meta name="description" content="מה מברכים על מה? ברכה ראשונה ואחרונה לכ־190 מאכלים, סדר הברכות לצלחת שלמה, ברכות הריח והראייה, בנוסח אשכנז, ספרד ועדות המזרח.">
   <meta name="theme-color" content="#0f1d45">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="icon" href="icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="מה אברך">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="מה אברך?">
+  <meta property="og:title" content="מה אברך? – ברכה ראשונה ואחרונה לכל מאכל">
+  <meta property="og:description" content="מחפשים מאכל ומקבלים את הברכה שלפניו ושלאחריו, סדר ברכות לצלחת שלמה, וברכות הריח והראייה.">
+  <meta property="og:url" content="https://gabbyh28.github.io/Ma_Avarech/">
+  <meta property="og:image" content="https://gabbyh28.github.io/Ma_Avarech/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="מה אברך? – אותיות זהב על רקע קטיפה כחולה">
+  <meta property="og:locale" content="he_IL">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap">
@@ -26,16 +40,17 @@
     </div>
     <p class="appbar-sub">ברכה ראשונה ואחרונה לכל מאכל</p>
   </header>
-  <div class="searchband">
+  <div class="searchband" role="search">
     <label class="search">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
       <input id="search" type="search" placeholder="חפשו מאכל: בננה, עוגה, במבה…" autocomplete="off" aria-label="חיפוש מאכל">
     </label>
   </div>
-  <div id="chips" class="catbar" role="group" aria-label="סינון לפי קטגוריה"></div>
+  <nav id="chips" class="catbar" aria-label="סינון לפי קטגוריה"></nav>
 
   <main>
     <section id="view-search" class="view">
+      <button id="settings-chip" class="settings-chip" type="button"></button>
       <div class="legend" id="legend" aria-label="מקרא צבעים"></div>
       <p id="count" class="count"></p>
       <ul id="results" class="results"></ul>
@@ -58,9 +73,47 @@
         <button id="plate-example" class="primary-btn">נסו דוגמה: קידוש וכיבוד</button>
       </div>
       <div id="plate-result"></div>
+      <div id="plate-actions" class="plate-actions" hidden>
+        <button id="plate-share" class="primary-btn" type="button">שיתוף סדר הברכות</button>
+      </div>
+    </section>
+
+    <section id="view-more" class="view" hidden>
+      <h2>ברכות נוספות</h2>
+      <div id="more-tabs" class="seg" role="tablist" aria-label="סוג הברכות"></div>
+      <div id="more-body"></div>
     </section>
 
     <section id="view-info" class="view info" hidden>
+      <h2>הגדרות</h2>
+      <div class="settings-panel">
+        <div class="setting">
+          <span class="setting-label" id="nusach-label">נוסח ומנהג</span>
+          <div id="nusach-seg" class="seg" role="radiogroup" aria-labelledby="nusach-label"></div>
+        </div>
+        <label class="setting toggle">
+          <span><span class="setting-label">פירות מארץ ישראל</span><span class="setting-hint">חתימת ״על הארץ ועל פירותיה / פרי גפנה״</span></span>
+          <input type="checkbox" id="opt-israel">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+        <label class="setting toggle">
+          <span><span class="setting-label">ניקוד בנוסחים</span><span class="setting-hint">הצגת הברכות עם ניקוד מלא</span></span>
+          <input type="checkbox" id="opt-nikud">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      <h2>אכלתי כשיעור?</h2>
+      <div class="calc" id="calc">
+        <div id="calc-kind" class="seg" role="radiogroup" aria-label="סוג"></div>
+        <label class="calc-row" for="calc-amount"><span id="calc-amount-label">כמות</span><output id="calc-amount-out"></output></label>
+        <input type="range" id="calc-amount" min="0" max="200" step="1" value="30">
+        <label class="calc-row" for="calc-time"><span id="calc-time-label">בכמה זמן</span><output id="calc-time-out"></output></label>
+        <input type="range" id="calc-time" min="0" max="15" step="1" value="3">
+        <div id="calc-result" class="calc-result" aria-live="polite"></div>
+        <p class="small">לפי השיעורים הנפוצים (שיעורי הגר״ח נאה). יש פוסקים שהשיעורים גדולים יותר. במקום ספק, נוהגים לאכול עוד כדי לצאת מהספק, או לא לברך.</p>
+      </div>
+
       <h2>סדר הקדימה</h2>
       <p>כשיש לפניך כמה מאכלים בלי לחם, מברכים לפי הסדר הזה:</p>
       <ol class="ladder" id="ladder"></ol>
@@ -100,6 +153,10 @@
       </span>
       <span>הצלחת</span>
     </button>
+    <button data-view="more">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 3 6 7 7-4 1-6 3-7 7-1-4-3-6-7-7 4-1 6-3 7-7z"/><path d="M19 16c.4 1.6 1.2 2.4 2.8 2.8-1.6.4-2.4 1.2-2.8 2.8-.4-1.6-1.2-2.4-2.8-2.8 1.6-.4 2.4-1.2 2.8-2.8z"/></svg>
+      <span>ברכות</span>
+    </button>
     <button data-view="info">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg>
       <span>הלכות</span>
@@ -116,6 +173,18 @@
       <div id="sheet-body"></div>
     </div>
   </div>
+
+  <div id="reader" class="reader" hidden role="dialog" aria-modal="true" aria-labelledby="reader-title">
+    <div class="reader-bar">
+      <button id="reader-smaller" class="reader-btn" type="button" aria-label="הקטנת הטקסט">א-</button>
+      <button id="reader-bigger" class="reader-btn" type="button" aria-label="הגדלת הטקסט">א+</button>
+      <button id="reader-close" class="reader-btn" type="button" aria-label="סגירת מסך הקריאה">✕</button>
+    </div>
+    <h2 id="reader-title" class="reader-title"></h2>
+    <div id="reader-text" class="reader-text"></div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
   <script type="module" src="src/app.js"></script>
 </body>
